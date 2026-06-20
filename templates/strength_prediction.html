@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Concrete Performance Prediction</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='fevicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    
+    .form-section {
+      max-width: 900px;
+      margin: 120px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .form-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    /* Page Container */
+    .page-container {
+      max-width: 900px;
+      margin: 120px auto 20px auto; 
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    h2 { margin-bottom: 20px; }
+
+    /* Form Fields */
+    .form-field { margin-bottom: 20px; }
+    .form-field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    input[type="number"],
+    select,
+    button[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button[type="submit"] {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 20px auto;
+      background: #e74c3c;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.3s;
+    }
+    button[type="submit"]:hover {
+      background: #c0392b;
+    }
+
+    .result {
+      margin-top: 30px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #27ae60;
+      text-align: center;
+    }
+
+    footer.site-footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 0.9em;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo-container">
+      <h1 class="site-title">MixXperts</h1>
+    </div>
+    <nav class="site-nav">
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+        <li><a href="{{ url_for('index') }}#features" class="nav-link">Features</a></li>
+        <li><a href="{{ url_for('index') }}#contact" class="nav-link">Contact</a></li>
+        <li><a href="{{ url_for('mix_optimization_route') }}" class="nav-link">Mix Optimization</a></li>
+        <li><a href="{{ url_for('generate_mix') }}" class="nav-link">Generate Mix Proportion</a></li>
+        <li><a href="{{ url_for('strength_prediction') }}" class="nav-link active">Strength Prediction</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <div class="form-section">
+      <h2>Concrete Performance Prediction</h2>
+      <form action="{{ url_for('predict') }}" method="POST">
+        <div class="form-field">
+          <label for="model_choice">Select Prediction Model</label>
+          <select id="model_choice" name="model_choice">
+            <option value="ANN">ANN</option>
+            <option value="XGBoost">XGBoost</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label for="Cement">Cement (kg/m³)</label>
+          <input type="number" step="0.1" id="Cement" name="Cement" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="BlastFurnaceSlag">Blast-furnace Slag (kg/m³)</label>
+          <input type="number" step="0.1" id="BlastFurnaceSlag" name="BlastFurnaceSlag" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="FlyAsh">Fly Ash (kg/m³)</label>
+          <input type="number" step="0.1" id="FlyAsh" name="FlyAsh" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="Water">Water (kg/m³)</label>
+          <input type="number" step="0.1" id="Water" name="Water" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="SuperPlasticizer">Super-plasticizer (kg/m³)</label>
+          <input type="number" step="0.1" id="SuperPlasticizer" name="SuperPlasticizer" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="CoarseAggregate">Coarse Aggregate (kg/m³)</label>
+          <input type="number" step="0.1" id="CoarseAggregate" name="CoarseAggregate" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="FineAggregate">Fine Aggregate (kg/m³)</label>
+          <input type="number" step="0.1" id="FineAggregate" name="FineAggregate" value="0.0" required>
+        </div>
+        <div class="form-field">
+          <label for="Age">Age of Testing (days)</label>
+          <input type="number" step="1" id="Age" name="Age" value="28" required>
+        </div>
+        <button type="submit">Predict Concrete Strength</button>
+      </form>
+
+      {% if prediction_result %}
+        <div class="result">
+          <p>{{ prediction_result }}</p>
+        </div>
+      {% endif %}
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 MixXperts. All rights reserved.</p>
+  </footer>
+</body>
+</html>

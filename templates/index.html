@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MixXperts - Home</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='fevicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo-container">
+      <h1 class="site-title">MixXperts</h1>
+    </div>
+    <nav class="site-nav">
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="nav-link active">Home</a></li>
+        <li><a href="{{ url_for('index') }}#features" class="nav-link">Features</a></li>
+        <li><a href="{{ url_for('index') }}#contact" class="nav-link">Contact</a></li>
+        <li><a href="{{ url_for('mix_optimization_route') }}" class="nav-link">Mix Optimization</a></li>
+        <li><a href="{{ url_for('generate_mix') }}" class="nav-link">Generate Mix Proportion</a></li>
+        <li><a href="{{ url_for('strength_prediction') }}" class="nav-link">Strength Prediction</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <section id="home" class="hero-section">
+      <div class="hero-content">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="MixXperts Logo" class="hero-logo">
+        <h2 class="hero-title">Concrete Mix Optimization</h2>
+        <p class="hero-subtitle">
+          Combine AI &amp; Material Science to design cost-effective, high-performance, and eco-friendly concrete.
+        </p>
+        <a href="#features" class="cta-button">Explore Features</a>
+      </div>
+    </section>
+    <section id="features" class="features-section">
+      <h2 class="section-title">Why MixXperts?</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>🏗️ AI-Driven Mix Design</h3>
+          <p>Reduce trial batches and optimize material costs while lowering your carbon footprint.</p>
+        </div>
+        <div class="feature-card">
+          <h3>⚙️ Multi-Objective Optimization</h3>
+          <p>Balance strength, cost, and emissions with advanced algorithms like NSGA-II.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📈 Real-Time Predictions</h3>
+          <p>Leverage machine learning models for accurate performance forecasts.</p>
+        </div>
+        <div class="feature-card">
+          <h3>📊 Interactive 3D Visualizations</h3>
+          <p>Explore dynamic graphs to fine-tune your mix and generate automated PDF reports.</p>
+        </div>
+        <div class="feature-card">
+          <h3> 🧱 IS Code Based Concrete Mix Design</h3>
+          <p>Generate your concrete mix design based on available materials and automatically create PDF reports.</p>
+        </div>
+        <div class="feature-card">
+          <h3> 🌱 Eco-Friendly Concrete Optimization</h3>
+          <p>Optimize concrete mix performance while tracking CO₂ emissions to reduce environmental impact.</p>
+        </div>
+      </div>
+    </section>
+    <section id="contact" class="contact-section">
+      <h2 class="section-title">Get in Touch</h2>
+      <p>For inquiries, collaborations, or demos, contact us:</p>
+      <p><strong>Email:</strong> <a href="mailto:info@mixxperts.com">info@mixxperts.com</a></p>
+      <p><strong>Phone:</strong> <a href="tel:+918102460089"> +918102460089</a></p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <p>© 2025 MixXperts. All rights reserved.</p>
+  </footer>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

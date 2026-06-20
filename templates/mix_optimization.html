@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mix Optimization</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='fevicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    /* Page Container */
+    .form-section {
+      max-width: 900px;
+      margin: 120px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .form-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .page-container {
+      max-width: 900px;
+      margin: 120px auto 20px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+    h2 { margin-bottom: 20px; }
+    /* Form Fields */
+    .form-field { margin-bottom: 20px; }
+    .form-field label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    /* Sliders */
+    input[type=range] {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #ddd;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #e74c3c;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    output { font-weight: bold; margin-left: 8px; }
+    /* Circular Spinner */
+    #spinner-container {
+      display: none;
+      text-align: center;
+      margin: 20px 0;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 6px solid #ddd;
+      border-top: 6px solid #e74c3c;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Submit Button */
+    button[type="submit"] {
+      background: #e74c3c;
+      color: #fff;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button[type="submit"]:hover { background: #c0392b; }
+    /* Tabs */
+    .tabs {
+      margin-top: 20px;
+      border-bottom: 2px solid #eee;
+      display: flex;
+      gap: 10px;
+    }
+    .tabs button {
+      background: none;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      transition: background 0.3s;
+    }
+    .tabs button.active {
+      background: #f1f1f1;
+      font-weight: 600;
+    }
+    .tab-content {
+      display: none;
+      margin-top: 10px;
+      overflow-x: auto;
+      padding-bottom: 10px;
+    }
+    .tab-content.active { display: block; }
+    /* Table */
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .table, .table th, .table td {
+      border: 1px solid #ccc;
+    }
+    .table th, .table td {
+      padding: 8px;
+      text-align: center;
+    }
+    .plot-image {
+      max-width: 100%;
+      display: block;
+      margin: 0 auto;
+    }
+    .download-link {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 16px;
+      background: #3498db;
+      color: #fff;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.3s;
+    }
+    .download-link:hover { background: #2980b9; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo-container">
+      <h1 class="site-title">MixXperts</h1>
+    </div>
+    <nav class="site-nav">
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+        <li><a href="{{ url_for('index') }}#features" class="nav-link">Features</a></li>
+        <li><a href="{{ url_for('index') }}#contact" class="nav-link">Contact</a></li>
+        <li><a href="{{ url_for('mix_optimization_route') }}" class="nav-link active">Mix Optimization</a></li>
+        <li><a href="{{ url_for('generate_mix') }}" class="nav-link">Generate Mix Proportion</a></li>
+        <li><a href="{{ url_for('strength_prediction') }}" class="nav-link">Strength Prediction</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main>
+    <div class="form-section">
+      <h2>Mix Optimization</h2>
+      <form id="optForm" method="POST" action="{{ url_for('mix_optimization_route') }}">
+        <h3>Mix Parameters</h3>
+        <div class="form-field">
+          <label for="Cement">Cement (kg/m³): <output id="Cement_val">{{ form_data['Cement'] }}</output></label>
+          <input type="range" name="Cement" id="Cement"
+                 min="0"
+                 max="{{ (form_data['Cement']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['Cement'] }}">
+        </div>
+        <div class="form-field">
+          <label for="Clinker">Clinker (kg/m³): <output id="Clinker_val">{{ form_data['Clinker'] }}</output></label>
+          <input type="range" name="Clinker" id="Clinker"
+                 min="0"
+                 max="{{ (form_data['Clinker']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['Clinker'] }}">
+        </div>
+        <div class="form-field">
+          <label for="Slag">Slag (kg/m³): <output id="Slag_val">{{ form_data['Slag'] }}</output></label>
+          <input type="range" name="Slag" id="Slag"
+                 min="0"
+                 max="{{ (form_data['Slag']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['Slag'] }}">
+        </div>
+        <div class="form-field">
+          <label for="FlyAsh">FlyAsh (kg/m³): <output id="FlyAsh_val">{{ form_data['FlyAsh'] }}</output></label>
+          <input type="range" name="FlyAsh" id="FlyAsh"
+                 min="0"
+                 max="{{ (form_data['FlyAsh']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['FlyAsh'] }}">
+        </div>
+        <div class="form-field">
+          <label for="Limestone">Limestone (kg/m³): <output id="Limestone_val">{{ form_data['Limestone'] }}</output></label>
+          <input type="range" name="Limestone" id="Limestone"
+                 min="0"
+                 max="{{ (form_data['Limestone']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['Limestone'] }}">
+        </div>
+        <div class="form-field">
+          <label for="Gypsum">Gypsum (kg/m³): <output id="Gypsum_val">{{ form_data['Gypsum'] }}</output></label>
+          <input type="range" name="Gypsum" id="Gypsum"
+                 min="0"
+                 max="{{ (form_data['Gypsum']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['Gypsum'] }}">
+        </div>
+        <div class="form-field">
+          <label for="Water">Water (kg/m³): <output id="Water_val">{{ form_data['Water'] }}</output></label>
+          <input type="range" name="Water" id="Water"
+                 min="0"
+                 max="{{ (form_data['Water']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['Water'] }}">
+        </div>
+        <div class="form-field">
+          <label for="SuperPlasticizer">SuperPlasticizer (kg/m³): <output id="SuperPlasticizer_val">{{ form_data['SuperPlasticizer'] }}</output></label>
+          <input type="range" name="SuperPlasticizer" id="SuperPlasticizer"
+                 min="0"
+                 max="{{ (form_data['SuperPlasticizer']|float + 100) }}"
+                 step="0.5"
+                 value="{{ form_data['SuperPlasticizer'] }}">
+        </div>
+        <div class="form-field">
+          <label for="CoarseAggregate">CoarseAggregate (kg/m³): <output id="CoarseAggregate_val">{{ form_data['CoarseAggregate'] }}</output></label>
+          <input type="range" name="CoarseAggregate" id="CoarseAggregate"
+                 min="0"
+                 max="{{ (form_data['CoarseAggregate']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['CoarseAggregate'] }}">
+        </div>
+        <div class="form-field">
+          <label for="FineAggregate">FineAggregate (kg/m³): <output id="FineAggregate_val">{{ form_data['FineAggregate'] }}</output></label>
+          <input type="range" name="FineAggregate" id="FineAggregate"
+                 min="0"
+                 max="{{ (form_data['FineAggregate']|float + 100) }}"
+                 step="1.0"
+                 value="{{ form_data['FineAggregate'] }}">
+        </div>
+
+        <h3>Optimization Parameters</h3>
+        <div class="form-field">
+          <label for="desired_strength">Desired Compressive Strength (MPa):</label>
+          <input type="number" name="desired_strength" id="desired_strength" step="0.1"
+                 value="{{ form_data['desired_strength'] }}">
+        </div>
+        <div class="form-field">
+          <label for="expected_date">Expected Age of Testing (days):</label>
+          <input type="number" name="expected_date" id="expected_date"
+                 value="{{ form_data['expected_date'] }}">
+        </div>
+        <div class="form-field">
+          <label for="iterations">Number of Optimization Iterations:</label>
+          <input type="number" name="iterations" id="iterations"
+                 value="{{ form_data['iterations'] }}">
+        </div>
+
+        <!-- Circular Spinner -->
+        <div id="spinner-container">
+          <div class="spinner"></div>
+          <p>Optimizing mix... Please wait</p>
+        </div>
+
+        <button type="submit">Run Optimization</button>
+      </form>
+    </div>
+
+    {% if results %}
+    <div class="page-container" style="margin-top: 40px;">
+      <div class="tabs">
+        <button class="tab-btn" data-tab="visuals">Visualizations</button>
+        <button class="tab-btn" data-tab="objectives">Optimal Objectives</button>
+        <button class="tab-btn" data-tab="mixparams">Optimal Mix Parameters</button>
+      </div>
+
+      <div id="visuals" class="tab-content">
+        <h3>Pairwise Feature vs. Cost Analysis</h3>
+        {% if plot_url %}
+        <img class="plot-image" src="data:image/png;base64,{{ plot_url }}" alt="Enhanced Scatter Plot">
+        {% endif %}
+        <h3>3D Trade-off Visualization</h3>
+        {% if plotly_html %}
+        {{ plotly_html|safe }}
+        {% endif %}
+        {% if pdf_base64 %}
+        <a class="download-link" href="data:application/pdf;base64,{{ pdf_base64 }}" download="Optimization_Report.pdf">
+          Download PDF Report
+        </a>
+        {% endif %}
+      </div>
+
+      <div id="objectives" class="tab-content">
+        <h3>Optimal Objective Values</h3>
+        <div style="max-width:100%; overflow-x:auto;">
+          {% if obj_df %}
+            {{ obj_df|safe }}
+          {% endif %}
+        </div>
+      </div>
+
+      <div id="mixparams" class="tab-content">
+        <h3>Optimal Mix Parameters</h3>
+        <div style="max-width:100%; overflow-x:auto;">
+          {% if mix_df %}
+            {{ mix_df|safe }}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2025 MixXperts. All rights reserved.</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+  <script>
+    // Update slider outputs in real time
+    document.querySelectorAll('input[type=range]').forEach(function(slider) {
+      const outputEl = document.getElementById(slider.id + '_val');
+      slider.addEventListener('input', function() {
+        outputEl.textContent = slider.value;
+      });
+    });
+
+    // Show circular spinner on form submit
+    document.getElementById('optForm').addEventListener('submit', function() {
+      document.getElementById('spinner-container').style.display = 'block';
+    });
+
+    // Tabs functionality
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(tc => tc.classList.remove('active'));
+        btn.classList.add('active');
+        const tabId = btn.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // Auto-open the first tab if results exist
+    window.addEventListener('load', function() {
+      var resultsExist = {{ 'true' if results else 'false' }};
+      if (resultsExist === true || resultsExist === 'true') {
+        var firstTab = document.querySelector('.tab-btn[data-tab="visuals"]');
+        if (firstTab) {
+          firstTab.click();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

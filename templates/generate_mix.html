@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generate Mix Proportion - MixXperts</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='fevicon.png') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <style>
+    /* Enhanced layout for Generate Mix Proportion page */
+    .form-section {
+      max-width: 900px;
+      margin: 120px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .form-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 15px;
+    }
+    .form-group {
+      flex: 1;
+      min-width: 200px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    /* Make placeholder text lighter with vendor prefixes */
+    .form-group input::placeholder {
+      color: #999 !important;
+      opacity: 1 !important;
+      font-style: italic !important;
+    }
+    .form-group input::-webkit-input-placeholder {
+      color: #999 !important;
+      opacity: 1 !important;
+      font-style: italic !important;
+    }
+    .form-group input::-moz-placeholder {
+      color: #999 !important;
+      opacity: 1 !important;
+      font-style: italic !important;
+    }
+    .form-group input:-ms-input-placeholder {
+      color: #999 !important;
+      opacity: 1 !important;
+      font-style: italic !important;
+    }
+    .form-group input::-ms-input-placeholder {
+      color: #999 !important;
+      opacity: 1 !important;
+      font-style: italic !important;
+    }
+    
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #e74c3c;
+    }
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .cta-button {
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      margin: 20px auto;
+      background: #e74c3c;
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: background 0.3s;
+    }
+    .cta-button:hover {
+      background: #c0392b;
+    }
+    .chart-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .chart-container img {
+      max-width: 100%;
+      height: auto;
+    }
+    /* Spinner Overlay Styles */
+    #overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .spinner {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #e74c3c;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    /* Small style for the toggle state text */
+    .toggle-state {
+      font-size: 0.9rem;
+      margin-left: 10px;
+      vertical-align: middle;
+      font-weight: bold;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="logo-container">
+      <h1 class="site-title">MixXperts</h1>
+    </div>
+    <nav class="site-nav">
+      <ul>
+        <li><a href="{{ url_for('index') }}" class="nav-link">Home</a></li>
+        <li><a href="{{ url_for('index') }}#features" class="nav-link">Features</a></li>
+        <li><a href="{{ url_for('index') }}#contact" class="nav-link">Contact</a></li>
+        <li><a href="{{ url_for('mix_optimization_route') }}" class="nav-link">Mix Optimization</a></li>
+        <li><a href="{{ url_for('generate_mix') }}" class="nav-link active">Generate Mix Proportion</a></li>
+        <li><a href="{{ url_for('strength_prediction') }}" class="nav-link">Strength Prediction</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="form-section">
+      <h2>Generate Mix Proportion</h2>
+      <form id="mixForm" method="POST" action="/generate_mix">
+        <!-- Grade and Mineral Admixture -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="grade">Grade Designation (e.g., M40):</label>
+            <input type="text" id="grade" name="GRADE" placeholder="M40" required value="">
+          </div>
+          <div class="form-group">
+            <label for="mineralAdmixture">Mineral Admixture:</label>
+            <select id="mineralAdmixture" name="TYPE_OF_MINERAL_ADMIXTURE">
+              <option value="" selected>None</option>
+              <option value="Fly ash">Fly ash</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Fly Ash Section -->
+        <div class="form-row" id="flyAshSection" style="display: none;">
+          <div class="form-group">
+            <label for="spFlyAsh">Specific Gravity of Fly Ash:</label>
+            <input type="number" step="0.01" id="spFlyAsh" name="SP_ADMIX" placeholder="e.g., 2.2" value="">
+          </div>
+        </div>
+
+        <!-- Aggregate Size & Workability -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="aggregateSize">Max Nominal Aggregate Size (mm):</label>
+            <select id="aggregateSize" name="SIZE_OF_AGGREGATE">
+              <option value="10">10</option>
+              <option value="20" selected>20</option>
+              <option value="40">40</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="workability">Workability (Slump, mm):</label>
+            <input type="number" step="0.1" id="workability" name="WORKABILITY" placeholder="e.g., 100" required value="">
+          </div>
+        </div>
+
+        <!-- Exposure & Concrete Type -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="exposure">Exposure Condition:</label>
+            <select id="exposure" name="EXPOSURE_CONDITION">
+              <option value="Mild">Mild</option>
+              <option value="Moderate" selected>Moderate</option>
+              <option value="Severe">Severe</option>
+              <option value="Very severe">Very severe</option>
+              <option value="Extreme">Extreme</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="concreteType">Type of Concrete:</label>
+            <select id="concreteType" name="TYPECONC">
+              <option value="Plain">Plain</option>
+              <option value="Reinforced" selected>Reinforced</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Pumping Toggle & Aggregate Type -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>
+              Will you pump the concrete?
+              <span class="toggle-state" id="pumpingState">No</span>
+            </label>
+            <!-- Hidden field defaulting to "no" -->
+            <input type="hidden" name="pumping" value="no">
+            <label class="switch">
+              <input type="checkbox" id="pumpingToggle" name="pumping" value="yes">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label for="aggregateType">Type of Aggregate:</label>
+            <select id="aggregateType" name="TYPE_OF_AGGREGATE">
+              <option value="Sub-angular">Sub-angular</option>
+              <option value="Gravel">Gravel</option>
+              <option value="Rounded Gravel">Rounded Gravel</option>
+              <option value="Crushed Angular" selected>Crushed Angular</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Chemical Admixture & Cement Gravity -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="chemicalAdmixture">Chemical Admixture:</label>
+            <select id="chemicalAdmixture" name="CHEMICAL_ADMIXTURE">
+              <option value="Super Plasticizer" selected>Super Plasticizer</option>
+              <option value="Plasticizer">Plasticizer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="spCement">Specific Gravity of Cement:</label>
+            <input type="number" step="0.01" id="spCement" name="SP_CEMENT" placeholder="e.g., 3.15" required value="">
+          </div>
+        </div>
+
+        <!-- Coarse & Fine Aggregate Gravity -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="spCoarseAgg">Spec. Gravity of Coarse Aggregate:</label>
+            <input type="number" step="0.01" id="spCoarseAgg" name="SP_CA" placeholder="e.g., 2.65" required value="">
+          </div>
+          <div class="form-group">
+            <label for="spFineAgg">Spec. Gravity of Fine Aggregate:</label>
+            <input type="number" step="0.01" id="spFineAgg" name="SP_FA" placeholder="e.g., 2.65" required value="">
+          </div>
+        </div>
+
+        <!-- Chemical Admixture Gravity & Coarse Absorption -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="spChemAdmix">Spec. Gravity of Chem. Admixture (1.15 default):</label>
+            <input type="number" step="0.01" id="spChemAdmix" name="SP_CHEMAD" min="1.15" placeholder="1.15" value="">
+          </div>
+          <div class="form-group">
+            <label for="waterAbsorpCA">Coarse Agg. Water Absorption (%):</label>
+            <input type="number" step="0.1" id="waterAbsorpCA" name="WATER_ABSORPTION_CA" placeholder="e.g., 0.5" required value="">
+          </div>
+        </div>
+
+        <!-- Fine Aggregate Absorption & Zone -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="waterAbsorpFA">Fine Agg. Water Absorption (%):</label>
+            <input type="number" step="0.1" id="waterAbsorpFA" name="WATER_ABSORPTION_FA" placeholder="e.g., 1.0" required value="">
+          </div>
+          <div class="form-group">
+            <label for="zoneFA">Zone of Fine Aggregates:</label>
+            <select id="zoneFA" name="ZONE_OF_FA">
+              <option value="Zone 1">Zone 1</option>
+              <option value="Zone 2" selected>Zone 2</option>
+              <option value="Zone 3">Zone 3</option>
+              <option value="Zone 4">Zone 4</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Toggles for Surface Moisture -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>
+              Surface moisture in Coarse Aggregates?
+              <span class="toggle-state" id="coarseState">No</span>
+            </label>
+            <!-- Hidden field defaulting to "no" -->
+            <input type="hidden" name="CA_SURFACE_MOISTURE" value="no">
+            <label class="switch">
+              <input type="checkbox" id="coarseMoistureToggle" name="CA_SURFACE_MOISTURE" value="yes">
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label>
+              Surface moisture in Fine Aggregates?
+              <span class="toggle-state" id="fineState">No</span>
+            </label>
+            <!-- Hidden field defaulting to "no" -->
+            <input type="hidden" name="FA_SURFACE_MOISTURE" value="no">
+            <label class="switch">
+              <input type="checkbox" id="fineMoistureToggle" name="FA_SURFACE_MOISTURE" value="yes">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-row">
+          <button type="submit" class="cta-button">Calculate Mix Proportion</button>
+        </div>
+      </form>
+
+      {% if results %}
+      <div id="resultsSection">
+        <h3>Calculated Mix Proportions</h3>
+        
+        <!-- Pie Chart Display -->
+        {% if pie_chart_base64 %}
+        <div class="chart-container">
+          <h4>Mix Composition</h4>
+          <img src="data:image/png;base64,{{ pie_chart_base64 }}" alt="Mix Proportion Pie Chart">
+        </div>
+        {% endif %}
+
+        <!-- Results Table -->
+        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+          <tr>
+            <th style="border:1px solid #ccc; padding:5px;">Parameter</th>
+            <th style="border:1px solid #ccc; padding:5px;">Value</th>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Target Strength (N/mm²)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.TARGET_STRENGTH|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Cement (kg/m³)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.CEMENT_CONTENT|default(0)|round(2) }}</td>
+          </tr>
+          {% if results.FLYASH_CONTENT is defined %}
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Fly Ash (kg/m³)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.FLYASH_CONTENT|default(0)|round(2) }}</td>
+          </tr>
+          {% endif %}
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Water (lit/m³)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.WATER_CONTENT|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Fine Aggregate (kg)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.MASS_FA|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Coarse Aggregate (kg)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.MASS_CA|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Chemical Admixture (kg/m³)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.MASS_CHEM_AD|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Water-Cement Ratio</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.WATER_CEMENT_RATIO|default(0)|round(3) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Coarse Agg. Water Absorption (lit)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.CA_WA|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Fine Agg. Water Absorption (lit)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.FA_WA|default(0)|round(2) }}</td>
+          </tr>
+          <tr>
+            <td style="border:1px solid #ccc; padding:5px;">Final Free Water (lit)</td>
+            <td style="border:1px solid #ccc; padding:5px;">{{ results.FREE_WATER|default(0)|round(2) }}</td>
+          </tr>
+        </table>
+
+        <!-- PDF Download Button -->
+        <div class="form-row">
+          <button id="downloadPdf" class="cta-button">Download PDF Report</button>
+        </div>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+
+  <!-- Spinner Overlay -->
+  <div id="overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <script>
+    // Toggle Fly Ash section based on Mineral Admixture selection
+    const mineralAdmixtureSelect = document.getElementById('mineralAdmixture');
+    const flyAshSection = document.getElementById('flyAshSection');
+    if (mineralAdmixtureSelect && flyAshSection) {
+      mineralAdmixtureSelect.addEventListener('change', function() {
+        if (this.value === "Fly ash") {
+          flyAshSection.style.display = "flex";
+        } else {
+          flyAshSection.style.display = "none";
+        }
+      });
+    }
+
+    // Function to update toggle state text
+    function updateToggleText(toggleId, spanId) {
+      const checkbox = document.getElementById(toggleId);
+      const stateSpan = document.getElementById(spanId);
+      if (checkbox.checked) {
+        stateSpan.textContent = "Yes";
+      } else {
+        stateSpan.textContent = "No";
+      }
+    }
+
+    // Set initial toggle state text
+    updateToggleText("pumpingToggle", "pumpingState");
+    updateToggleText("coarseMoistureToggle", "coarseState");
+    updateToggleText("fineMoistureToggle", "fineState");
+
+    // Add event listeners to update toggle state text on change
+    document.getElementById("pumpingToggle").addEventListener("change", function() {
+      updateToggleText("pumpingToggle", "pumpingState");
+    });
+    document.getElementById("coarseMoistureToggle").addEventListener("change", function() {
+      updateToggleText("coarseMoistureToggle", "coarseState");
+    });
+    document.getElementById("fineMoistureToggle").addEventListener("change", function() {
+      updateToggleText("fineMoistureToggle", "fineState");
+    });
+
+    // PDF Download Handler with Spinner Overlay
+    const downloadPdfBtn = document.getElementById('downloadPdf');
+    const overlay = document.getElementById('overlay');
+    if (downloadPdfBtn) {
+      downloadPdfBtn.addEventListener('click', async () => {
+        if (overlay) overlay.style.display = 'flex';
+        try {
+          const response = await fetch('/download_mix_pdf', { method: 'POST' });
+          const blob = await response.blob();
+          if (overlay) overlay.style.display = 'none';
+          const downloadUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = 'Mix_Design_Report.pdf';
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(downloadUrl);
+          document.body.removeChild(a);
+        } catch (error) {
+          if (overlay) overlay.style.display = 'none';
+          console.error('Download failed:', error);
+          alert('Failed to download PDF. Please try again.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
